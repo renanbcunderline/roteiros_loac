@@ -19,9 +19,6 @@ module top(input  logic clk_2,
            output logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite);
 
   always_comb begin
-    SEG <= SWI;
-    LED[0] <= SWI[0] & SWI[1];
-    LED[1] <= SWI[0] | SWI[1];
     lcd_WriteData <= SWI;
     lcd_pc <= 'h12;
     lcd_instruction <= 'h34567890;
@@ -39,6 +36,21 @@ module top(input  logic clk_2,
        else                   lcd_registrador[i] <= ~SWI;
     lcd_a <= {56'h1234567890ABCD, SWI};
     lcd_b <= {SWI, 56'hFEDCBA09876543};
+
+	
   end
 
+	parameter LETRA_A = 'b01110111';
+	parameter LETRA_F = 'b01110001';
+	parameter LETRA_P = 'b01110011';
+	
+	logic [NBITS_NOTA-1:0] nota;
+	always_comb nota <= SWI;
+	always_comb
+		if (nota >= 7)
+			SEG <= LETRA_A;
+		else if (nota >= 4)
+			SEG <= LETRA_F;
+		else
+			SEG <= LETRA_P;
 endmodule
