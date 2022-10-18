@@ -1,5 +1,5 @@
-// Renan Chaves Bezerra
-// Roteiro 1.
+// Renan Chaves Bezerra - 121110071
+// Roteiro 1
 
 parameter divide_by=100000000;  // divisor do clock de referência
 // A frequencia do clock de referencia é 50 MHz.
@@ -19,6 +19,7 @@ module top(input  logic clk_2,
            output logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite);
 
   always_comb begin
+    //SEG <= SWI;
     lcd_WriteData <= SWI;
     lcd_pc <= 'h12;
     lcd_instruction <= 'h34567890;
@@ -36,21 +37,73 @@ module top(input  logic clk_2,
        else                   lcd_registrador[i] <= ~SWI;
     lcd_a <= {56'h1234567890ABCD, SWI};
     lcd_b <= {SWI, 56'hFEDCBA09876543};
-
-	
   end
 
-	parameter LETRA_A = 'b01110111';
-	parameter LETRA_F = 'b01110001';
-	parameter LETRA_P = 'b01110011';
+	// COFRE
 	
-	logic [NBITS_NOTA-1:0] nota;
-	always_comb nota <= SWI;
-	always_comb
-		if (nota >= 7)
-			SEG <= LETRA_A;
-		else if (nota >= 4)
-			SEG <= LETRA_F;
+	logic cofre;
+	logic relogio;
+	logic gerente;
+	logic alarme;
+	
+  always_comb begin
+  	cofre <= SWI[0];
+  	relogio <= SWI[1];
+  	gerente <= SWI[2];
+  end
+  
+  
+  always_comb 
+  	alarme <= cofre & (~relogio | gerente);
+  
+  always_comb
+  	LED[1] <= alarme;
+ 	
+  // ESTUFA
+  
+  logic t1;
+  logic t2;
+  logic a;
+  logic r;
+  logic i;
+  
+  always_comb begin
+  	t1 <= SWI[7];
+  	t2 <= SWI[6];
+	end
+	
+	always_comb begin
+		if (t1)
+			if (t2) begin
+				a <= 0;
+				r <= 1;
+				i <= 0;
+			end
+				
+			else begin
+				a <= 0;
+				r <= 0;
+				i <= 0;
+				end
+				
 		else
-			SEG <= LETRA_P;
+			if (t2) begin
+				a <= 0;
+				r <= 0;
+				i <= 1;
+				end
+				
+			else begin
+				a <= 1;
+				r <= 0;
+				i <= 0;
+				end
+	end
+	
+	always_comb begin
+		LED[7] <= a;
+		LED[6] <= r;
+		SEG[7] <= i;
+	end
+	
 endmodule
