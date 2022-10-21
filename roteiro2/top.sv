@@ -40,29 +40,24 @@ module top(input  logic clk_2,
 
 // IRRIGAÇÂO
  
-	parameter apagado = 'b00000000';
-	parameter zero = 'b01111110';
-	parameter um = 'b00110000';
-	parameter dois = 'b01101101';
+	parameter apagado = 'b00000000;
+	parameter zero = 'b00111111;
+	parameter um = 'b00000110;
+	parameter dois = 'b01011011;
 	
-	logic area0;
-	logic area1;
 	
-	always_comb begin
-		area0 <= SWI[0];
-		area1 <= SWI[1];
-	end
+	logic [1:0] areas;
 	
-	always_comb begin
-		if (area1 == 1 & area0 == 1)
-			SEG <= dois;
-		else if (area0 == 0 & area1 == 1)
-			SEG <= um;
-		else if (area0 == 1 & area0 == 0)
-			SEG <= zero;
-		else
-			SEG <= apagado;
-	end
+	always_comb
+		areas <= SWI[1:0];
+
+	always_comb 
+		unique case (areas)
+			'b11 : SEG <= dois;
+			'b01 : SEG <= um;
+			'b10 : SEG <= zero;
+			'b00 : SEG <= apagado;
+		endcase
 	
 // ROTEAMENTO
 
@@ -86,6 +81,5 @@ module top(input  logic clk_2,
 	
 	always_comb
 		LED[7:6] <= saida;
-	end
 	
 endmodule
