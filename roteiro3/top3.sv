@@ -67,13 +67,14 @@ module top(input  logic clk_2,
 	
 	
 	
-	always_comb 
-		case (op)
+	always_comb begin
+		unique case (op)
 			'b00: saida <= a + b;
 			'b01: saida <= a - b;
 			'b10: saida <= a & b;
 			'b11: saida <= a | b;
 		endcase
+	end
 	
 	
 					
@@ -95,7 +96,7 @@ module top(input  logic clk_2,
 	
 	
 
-	always_comb
+	always_comb begin
 		if (saida > 'b0011 && saida < 'b1100) begin
 			LED[7] <= 1;
 			LED[3:0] <= 000;
@@ -104,6 +105,7 @@ module top(input  logic clk_2,
 			LED[7] <= 0;
 			LED[3:0] <= saida;
 		end
+	end
 
 
 				
