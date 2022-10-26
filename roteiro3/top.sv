@@ -40,21 +40,24 @@ module top(input  logic clk_2,
 
 // ULA
 
-	logic [2:0] a;
-	logic [2:0] b;
+	logic signed [2:0] a;
+	logic signed [2:0] b;
 	logic [1:0] op;
-	logic result [3:0];
-	logic [2:0] saida;
+	logic signed [3:0] saida;
 	
 	
+	
+	parameter erro = 'b10000000;
 	parameter zero = 'b00111111;
 	parameter um = 'b00000110;
 	parameter dois = 'b01011011;
 	parameter tres = 'b01001111;
-	parameter um_ = 'b10000110;
-	parameter dois_ = 'b11011011;
-	parameter tres_ = 'b11001111;
-	parameter quatro_ = 'b11100110;
+	parameter m_um = 'b10000110;
+	parameter m_dois = 'b11011011;
+	parameter m_tres = 'b11001111;
+	parameter m_quatro = 'b11100110;
+	
+	
 	
 	always_comb begin
 		a <= SWI[7:5];
@@ -62,27 +65,48 @@ module top(input  logic clk_2,
 		op <= SWI [4:3];
 	end
 	
-	always_comb
+	
+	
+	always_comb begin
 		unique case (op)
 			'b00: saida <= a + b;
 			'b01: saida <= a - b;
 			'b10: saida <= a & b;
 			'b11: saida <= a | b;
 		endcase
+	end
+	
+	
 					
-	always_comb
-		unique case (saida)
-			'b000 : SEG <= zero;
-			'b001 : SEG <= um;
-			'b010 : SEG <= dois;
-			'b011 : SEG <= tres;
-			'b111 : SEG <= um_;
-			'b110 : SEG <= dois_;
-			'b101 : SEG <= tres_;
-			'b100 : SEG <= quatro_;
+	always_comb begin
+		case (saida)
+			4'b0000 : SEG <= zero;
+			4'b0001 : SEG <= um;
+			4'b0010 : SEG <= dois;
+			4'b0011 : SEG <= tres;
+			4'b1111 : SEG <= m_um;
+			4'b1110 : SEG <= m_dois;
+			4'b1101 : SEG <= m_tres;
+			4'b1100 : SEG <= m_quatro;
+			
+			default : SEG <= erro;
+			
 		endcase
+	end
+	
+	
 
-	always_comb
-		LED[2:0] <= saida;
-		
+	always_comb begin
+		if (saida > 'b0011 && saida < 'b1100) begin
+			LED[7] <= 1;
+			LED[2:0] <= 000;
+		end
+		else begin
+			LED[7] <= 0;
+			LED[2:0] <= saida [2:0];
+		end
+	end
+
+
+				
 endmodule
