@@ -38,10 +38,9 @@ module top(input  logic clk_2,
     lcd_b <= {SWI, 56'hFEDCBA09876543};
   end
 
-<<<<<<< HEAD
   // MEMORIA RAM R/W 4X4
 	
-	parameter  ADDR_WIDTH = 2;
+	parameter ADDR_WIDTH = 2;
 	parameter DATA_WIDTH = 4;
 	
 	logic wr_op;
@@ -65,37 +64,4 @@ module top(input  logic clk_2,
 	always_comb LED[7:4] <= mem[addr];
 
 endmodule
-=======
-  // REGISTRADOR PARALELO/SERIAL
-	
-	parameter NBITS_DATA = 4;
-	logic [NBITS_DATA -1:0] data_in_parallel, data_in_serial, data_out;
-	logic reset;
-	logic select;
-	
-	always_comb reset <= SWI[1];
-	always_comb select <= SWI[2];
-	always_comb data_in_parallel <= SWI[7:4];
-	always_comb data_in_serial <= SWI[3];
-	
-	always_ff @(posedge reset or posedge clk_2) begin
-		if (reset) begin
-			data_out <= 0;
-		end
-		
-		else begin
-			if (select == 0) begin
-				data_out <= {data_in_serial, data_out[3:1]};		
-			end
-			
-			else begin
-				data_out <= data_in_parallel;
-			end
-		end
-	end
-	
-	always_comb LED[7:4] <= data_out;
-	always_comb LED[0] <= clk_2;
 
-endmodule
->>>>>>> fd1c07657268605c25d2bc0f315e0c0090f3afe2
