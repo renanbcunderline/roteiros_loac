@@ -44,18 +44,18 @@ module top(input  logic clk_2,
   parameter um = 'b00000110;
   parameter dois = 'b01011011;
   parameter tres = 'b01001111;
-  parameter quatro = 'b00110011;
-  parameter cinco = 'b01011011;
-  parameter seis = 'b01011111;
-  parameter sete = 'b0111000;
-  parameter oito = 'b01111110;
-  parameter nove = 'b0111000;
+  parameter quatro = 'b01100110;
+  parameter cinco = 'b1101101;
+  parameter seis = 'b01111101;
+  parameter sete = 'b00000111;
+  parameter oito = 'b01111111;
+  parameter nove = 'b01100111;
   parameter a = 'b01110111;
-  parameter b = 'b00011111;
-  parameter c = 'b01001110;
-  parameter d = 'b00111101;
-  parameter e = 'b01001111;
-  parameter f = 'b01000111; 
+  parameter b = 'b01111100;
+  parameter c = 'b00111001;
+  parameter d = 'b01011110;
+  parameter e = 'b01111001;
+  parameter f = 'b01110001; 
   
   parameter NBITS_COUNT = 4;
   logic [NBITS_COUNT-1 : 0] Data_in, Count;
@@ -77,38 +77,80 @@ module top(input  logic clk_2,
   		
   	else begin
   		if (count_up)
-  			Count <= Count + 1;
-  		else
   			Count <= Count - 1;
+  		else
+  			Count <= Count + 1;
   	end
   end
   
   always_comb begin
-  	LED[0] <= clk_2;
+  	LED[7] <= clk_2;
   	LED[1] <= count_up;
-  	LED[7 : 4] <= Count;
   end
   
   always_comb begin
 		case (Count)
-			4'b0000 : SEG <= zero;
-			4'b0001 : SEG <= um;
-			4'b0010 : SEG <= dois;
-			4'b0011 : SEG <= tres;
-			4'b0100 : SEG <= quatro;
-			4'b0101 : SEG <= cinco;
-			4'b0110 : SEG <= seis;
-			4'b0111 : SEG <= sete;
-			4'b1000 : SEG <= oito;
-			4'b1001 : SEG <= nove;
-			4'b1010 : SEG <= a;
-			4'b1011 : SEG <= b;
-			4'b1100 : SEG <= c;
-			4'b1101 : SEG <= d;
-			4'b1110 : SEG <= e;
-			4'b1111 : SEG <= f;
+			'b0000 : SEG <= zero;
+			'b0001 : SEG <= um;
+			'b0010 : SEG <= dois;
+			'b0011 : SEG <= tres;
+			'b0100 : SEG <= quatro;
+			'b0101 : SEG <= cinco;
+			'b0110 : SEG <= seis;
+			'b0111 : SEG <= sete;
+			'b1000 : SEG <= oito;
+			'b1001 : SEG <= nove;
+			'b1010 : SEG <= a;
+			'b1011 : SEG <= b;
+			'b1100 : SEG <= c;
+			'b1101 : SEG <= d;
+			'b1110 : SEG <= e;
+			'b1111 : SEG <= f;
 			
 		endcase
 	end
+	
+	//	DETECTOR DE SEQUENCIA
+	
+	logic in_bit, out_bit;
+	
+	always_comb in_bit <= SWI[3];
+	
+	enum logic [3 : 0] {A, B, C, D} state;
+	
+	always_ff @ (posedge clk_2) begin
+		if (reset) state <= A;
+		
+		else 
+			unique case (state)
+				A:
+					if (in_bit == 0)
+						state <= A;
+					else
+						state <= B;
+						
+				B:
+					if (in_bit == 0)
+						state <= A;
+					else
+						state <= C;
+						
+				C:
+					if (in_bit <= 0)
+						state <= A;
+					else
+						state <= D;
+						
+				D:
+					if (in_bit <= 0)
+						state <= A;
+					else
+						state <= D;
+			endcase
+	
+	end
+	
+	always_comb out_bit <= (state == D);
+	always_comb LED[0] <= out_bit;
   
 endmodule
